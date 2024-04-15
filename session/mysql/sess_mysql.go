@@ -19,6 +19,7 @@
 // go install github.com/go-sql-driver/mysql
 //
 // mysql session support need create table as sql:
+//
 //	CREATE TABLE `session` (
 //	`session_key` char(64) NOT NULL,
 //	`session_data` blob,
@@ -28,8 +29,10 @@
 //
 // Usage:
 // import(
-//   _ "github.com/astaxie/beego/session/mysql"
-//   "github.com/astaxie/beego/session"
+//
+//	_ "github.com/astaxie/beego/session/mysql"
+//	"github.com/astaxie/beego/session"
+//
 // )
 //
 //	func init() {
@@ -42,6 +45,7 @@ package mysql
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"sync"
 	"time"
@@ -109,6 +113,8 @@ func (st *SessionStore) SessionID() string {
 // must call this method to save values to database.
 func (st *SessionStore) SessionRelease(w http.ResponseWriter) {
 	defer st.c.Close()
+
+	fmt.Println("session release ", st.values)
 	b, err := session.EncodeGob(st.values)
 	if err != nil {
 		return
@@ -142,11 +148,13 @@ func (mp *Provider) SessionInit(maxlifetime int64, savePath string) error {
 
 // SessionRead get mysql session by sid
 func (mp *Provider) SessionRead(sid string) (session.Store, error) {
+	fmt.Println("session read sid ", sid)
 	c := mp.connectInit()
 	row := c.QueryRow("select session_data from "+TableName+" where session_key=?", sid)
 	var sessiondata []byte
 	err := row.Scan(&sessiondata)
 	if err == sql.ErrNoRows {
+		fmt.Println("session mysql no rows ", sid)
 		c.Exec("insert into "+TableName+"(`session_key`,`session_data`,`session_expiry`) values(?,?,?)",
 			sid, "", time.Now().Unix())
 	}
