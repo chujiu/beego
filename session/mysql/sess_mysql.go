@@ -114,7 +114,8 @@ func (st *SessionStore) SessionID() string {
 func (st *SessionStore) SessionRelease(w http.ResponseWriter) {
 	defer st.c.Close()
 
-	fmt.Println("session release ", st.values)
+	fmt.Println("release session", st.values, "sid", st.sid)
+	//fmt.Println("session release ", st.values)
 	b, err := session.EncodeGob(st.values)
 	if err != nil {
 		return
