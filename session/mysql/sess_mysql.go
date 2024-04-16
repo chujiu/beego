@@ -100,6 +100,7 @@ func (st *SessionStore) Delete(key interface{}) error {
 func (st *SessionStore) Flush() error {
 	st.lock.Lock()
 	defer st.lock.Unlock()
+	fmt.Printf("flush session %s\n", st.sid)
 	st.values = make(map[interface{}]interface{})
 	return nil
 }
@@ -113,7 +114,6 @@ func (st *SessionStore) SessionID() string {
 // must call this method to save values to database.
 func (st *SessionStore) SessionRelease(w http.ResponseWriter) {
 	defer st.c.Close()
-
 	fmt.Println("release session", st.values, "sid", st.sid)
 	//fmt.Println("session release ", st.values)
 	b, err := session.EncodeGob(st.values)
@@ -184,6 +184,7 @@ func (mp *Provider) SessionExist(sid string) bool {
 
 // SessionRegenerate generate new sid for mysql session
 func (mp *Provider) SessionRegenerate(oldsid, sid string) (session.Store, error) {
+	fmt.Printf("session regenerate oldsid %s sid %s\n", oldsid, sid)
 	c := mp.connectInit()
 	row := c.QueryRow("select session_data from "+TableName+" where session_key=?", oldsid)
 	var sessiondata []byte
