@@ -155,7 +155,7 @@ func (mp *Provider) SessionRead(sid string) (session.Store, error) {
 	var sessiondata []byte
 	err := row.Scan(&sessiondata)
 	if err == sql.ErrNoRows {
-		fmt.Println("session mysql no rows ", sid)
+		fmt.Println("session read mysql no rows ", sid)
 		c.Exec("insert into "+TableName+"(`session_key`,`session_data`,`session_expiry`) values(?,?,?)",
 			sid, "", time.Now().Unix())
 	}
@@ -189,6 +189,7 @@ func (mp *Provider) SessionRegenerate(oldsid, sid string) (session.Store, error)
 	var sessiondata []byte
 	err := row.Scan(&sessiondata)
 	if err == sql.ErrNoRows {
+		fmt.Println("session generate mysql no rows oldsid ", oldsid, sid)
 		c.Exec("insert into "+TableName+"(`session_key`,`session_data`,`session_expiry`) values(?,?,?)", oldsid, "", time.Now().Unix())
 	}
 	c.Exec("update "+TableName+" set `session_key`=? where session_key=?", sid, oldsid)
@@ -208,6 +209,7 @@ func (mp *Provider) SessionRegenerate(oldsid, sid string) (session.Store, error)
 // SessionDestroy delete mysql session by sid
 func (mp *Provider) SessionDestroy(sid string) error {
 	c := mp.connectInit()
+	fmt.Println("session destory sid ", sid)
 	c.Exec("DELETE FROM "+TableName+" where session_key=?", sid)
 	c.Close()
 	return nil
@@ -216,6 +218,7 @@ func (mp *Provider) SessionDestroy(sid string) error {
 // SessionGC delete expired values in mysql session
 func (mp *Provider) SessionGC() {
 	c := mp.connectInit()
+	fmt.Println("session gc ", time.Now().Unix()-mp.maxlifetime)
 	c.Exec("DELETE from "+TableName+" where session_expiry < ?", time.Now().Unix()-mp.maxlifetime)
 	c.Close()
 }
