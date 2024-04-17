@@ -226,7 +226,7 @@ func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (se
 	}
 
 	session, err = manager.provider.SessionRead(sid)
-	fmt.Println("session manager read session id and session key", session.SessionID() session.Get("meID"))
+	fmt.Println("session manager read session id and session key", session.SessionID(), session.Get("meID"))
 	if err != nil {
 		return nil, err
 	}
