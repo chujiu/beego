@@ -168,6 +168,7 @@ func (mp *Provider) SessionRead(sid string) (session.Store, error) {
 			return nil, err
 		}
 	}
+	fmt.Println("session read values ", kv)
 	rs := &SessionStore{c: c, sid: sid, values: kv}
 	return rs, nil
 }
