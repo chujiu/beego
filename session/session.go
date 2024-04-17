@@ -226,7 +226,9 @@ func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (se
 	}
 
 	session, err = manager.provider.SessionRead(sid)
+
 	fmt.Println("session manager read session id and session key", session.SessionID(), session.Get("meID"))
+
 	if err != nil {
 		return nil, err
 	}
@@ -238,10 +240,15 @@ func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (se
 		Secure:   manager.isSecure(r),
 		Domain:   manager.config.Domain,
 	}
+
+	fmt.Println("session manager cookie before", cookie)
+
 	if manager.config.CookieLifeTime > 0 {
 		cookie.MaxAge = manager.config.CookieLifeTime
 		cookie.Expires = time.Now().Add(time.Duration(manager.config.CookieLifeTime) * time.Second)
 	}
+
+	fmt.Println("session manager cookie after", cookie)
 	if manager.config.EnableSetCookie {
 		http.SetCookie(w, cookie)
 	}
