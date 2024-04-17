@@ -16,13 +16,15 @@
 //
 // Usage:
 // import(
-//   "github.com/astaxie/beego/session"
+//
+//	"github.com/astaxie/beego/session"
+//
 // )
 //
-//	func init() {
-//      globalSessions, _ = session.NewManager("memory", `{"cookieName":"gosessionid", "enableSetCookie,omitempty": true, "gclifetime":3600, "maxLifetime": 3600, "secure": false, "cookieLifeTime": 3600, "providerConfig": ""}`)
-//		go globalSessions.GC()
-//	}
+//		func init() {
+//	     globalSessions, _ = session.NewManager("memory", `{"cookieName":"gosessionid", "enableSetCookie,omitempty": true, "gclifetime":3600, "maxLifetime": 3600, "secure": false, "cookieLifeTime": 3600, "providerConfig": ""}`)
+//			go globalSessions.GC()
+//		}
 //
 // more docs: http://beego.me/docs/module/session.md
 package session
@@ -81,7 +83,7 @@ func Register(name string, provide Provider) {
 	provides[name] = provide
 }
 
-//GetProvider
+// GetProvider
 func GetProvider(name string) (Provider, error) {
 	provider, ok := provides[name]
 	if !ok {
@@ -211,6 +213,8 @@ func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (se
 		return nil, errs
 	}
 
+	fmt.Println("session manager read sid", sid)
+
 	if sid != "" && manager.provider.SessionExist(sid) {
 		return manager.provider.SessionRead(sid)
 	}
@@ -222,6 +226,7 @@ func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (se
 	}
 
 	session, err = manager.provider.SessionRead(sid)
+	fmt.Println("session manager read session id and session key", session.SessionID() session.Get("meID"))
 	if err != nil {
 		return nil, err
 	}

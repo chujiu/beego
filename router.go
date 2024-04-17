@@ -727,6 +727,7 @@ func (p *ControllerRegister) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	if BConfig.WebConfig.Session.SessionOn {
 		var err error
 		context.Input.CruSession, err = GlobalSessions.SessionStart(rw, r)
+		fmt.Println("session read request url and crusession", urlPath, context.Input.CruSession)
 		if err != nil {
 			logs.Error(err)
 			exception("503", context)
